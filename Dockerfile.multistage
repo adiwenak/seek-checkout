@@ -10,6 +10,6 @@ RUN go build -o seek-checkout -a
 FROM scratch AS final
 EXPOSE 8080
 WORKDIR /app
-ENV GIN_MODE=release
+# ENV GIN_MODE=release
 COPY --from=builder /project/seek-checkout .
 ENTRYPOINT ["/app/seek-checkout"]

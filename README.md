@@ -1,16 +1,37 @@
-# eKYC-backend
+# SEEK
 
-1. [ Requirements and Assumptions](#requirements)
+1. [ Requirements and Assumptions ](#requirements)
 2. [ Getting Started ](#getting-started)
-3. [ Project Structure. ](#project-structure)
-4. [ Swagger Document. ](#swagger-document)
+
+<a name="requirements"></a>
+## Requirements and Assumptions
+
+### Requirements
+1. Write SEEK job ads checkout system
+2. Privilaged customer has pricing rules for a certain items
+3. Pricing rule is frequently negotiated built a system where it is easy to change the pricing rule for a given customer
+4. Develop either backend or frontend system
+
+### Assumptions
+1. For this demo we will focus on developing total price functionality for given ads items
+2. We will built API called `POST /checkout/totalprice` which can be use by frontend (Web, Mobile, etc) to calculate total price of all items in the cart
+3. For a given customer no overlapping rules for the same item. For example BHP customer should not have the following pricing rules
+    - Gets a 3 for 2 deal on Classic Ads
+    - Special discount on Classic Ads $200
+4. Pricing rule apply to a single item not multiple items. The following is not possible:
+    - Gets 3 Classic and 2 Stand Outs Ads for $1000
+
+### Entity Design
+
+![alt](Design.png)
+
 
 <a name="getting-started"></a>
 ## Getting Started
 
 ### Pre-requisite
 1. GoLang version 1.18+
-2. Docker
+2. Docker 
 
 ### Running as Binary
 1. To run this application you need to install go 1.18
@@ -22,74 +43,28 @@
 ### Running as Docker
 
 1. Build the docker image using multistage build  
-`docker build -f Dockerfile.multistage -t seek-checkout .`
+`docker build -f Dockerfile.multistage -t seek-checkout:latest .`
 
-2. Run docker image. Note that the default port is 4545 if you like to change the port please read the __Application Config__ section
-`docker run -p 8080:8080 seek-checkout`
-
-### System Endpoint
-1. `/health` use for health check.
-2. `/swaggerui` to open up swagger document. To read more about how this project configure the swagger doc please read the __Swagger Document__ section
+2. Run docker image `docker run -p 8080:8080 seek-checkout`
 
 ### Sample Run
 
-After you run all the components with `make up` try the following curl command
+1. After successfully running the service go to `http://localhost:8080/swaggerui/#/Checkout/post_checkout_totalprice`
+2. Click 'Try it out'
+3. Enter customerid in the parameters. Ideally this should be an authenticated session but for simplicity we are just going to set the customerid in the header directly
+4. The following are the configuration for the items:
+    - Id "1" => Classic Ad
+    - Id "2" => Stand out Ad
+    - Id "3" => Premium Ad
+5. The following are the configuration for the customer:
+    - "2" => SecondBine
+    - "3" => Axil Coffee Roasters
+    - "4" => MYER
+6. The request body already has necessary payload or you can set it yourself too.
+7. Click Execute
+8. If you have set customerid as "1" you would get
 ```
-curl --location --request POST 'http://localhost:4545/v1/session/start' \
---header 'x-b3-traceId: asd314' \
---header 'x-b3-spanid: 123' \
---header 'x-b3-parentspanid: zxc123' \
---header 'Content-Type: application/json' \
---data-raw '{
-    "email": "alex@gmail.com",
-    "reference": "000000000"
-}'
+{
+  "totalPrice": "1797.94"
+}
 ```
-You should be able to get response header as following
-```
-Expiration-Time : 1658794375
-Set-Cookie: eKYC-Session=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmaXJzdE5hbWUiOiJhbGV4IiwiY291bnRyeSI6IkFVIiwiZXhwIjoxNjU4Nzk0Mzc1fQ.D0f6GNU53foJi_8PhC9PmGblWKF8AvMBHc5l22t6xG4; Path=/; Domain=localhost; Max-Age=1658794375; HttpOnly
-
-```
-
-<a name="running-tests"></a>
-## Running Tests
-### Unit Test
-
-1. `make test-unit` run unit test and will generate coverage report 'coverage.out' in the root folder
-2. `make test-html-result` this will generate human readable html report base on 'coverage.out'. Therefore you need to run `make test-unit` before running this command
-2. `make test-api` run API test. This will do following things:
-   1. stop/remove existing old running docker containers
-   2. build/running new containers 
-   3. running the API testing
-3. `make retest-api` re-run the API tests in existing running docker   
-4. `make test-all` run all testings include API testing
-5. `make test-html-result` build/open up html coverage report
-
-<a name="project-structure"></a>
-## Project Structure
-
-`/api_test` contains APT test files
-`/ci` contains Codefresh CI scripts
-`/client` contains all http client with downstream services eg. COBRA
-`/controller` contains all gin RESTFul HTTP handler
-`/middleware` contains all gin middleware handler
-`/mocks` contains all mock classes that are used for testing. Some are generated using mockgen
-`/repository` contains all objects relate to database access
-`/resource` contains request and response objects
-`/security` contains certs and key
-`/security_local` contains local self-signed cert and key
-`/sequence_diagram` contains sequence diagram
-`/server` contains service route configration and server startup sequence
-`/service` contains services function that help HTTP handler
-`/stub` contains stub services use for API testing
-`/swagger` contains swagger files
-`/utils` contains utilites/helper function
-
-<a name="swagger-document"></a>
-## Swagger Document
-
-### Open Swagger UI
-1. To open swagger document go to this path `/swaggerui/` with your web browser.
-For example `https://localhost:4545/swaggerui/`
-2. This path is configured under `router.go`. Take a look at the file and you will find the configuration for `/swaggerui/*any` route

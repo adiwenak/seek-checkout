@@ -9,11 +9,13 @@ import (
 )
 
 type CheckoutRest struct {
-	CheckoutService services.CheckoutService
+	CheckoutService services.CheckoutServiceInterface
 }
 
 func NewCheckoutRest() *CheckoutRest {
-	return &CheckoutRest{}
+	return &CheckoutRest{
+		CheckoutService: services.NewCheckoutService(),
+	}
 }
 
 func (controller *CheckoutRest) TotalPrice(c *gin.Context) {
