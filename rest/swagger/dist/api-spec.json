@@ -1,0 +1,130 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "eKYC Backend API",
+    "description": "eKYC Backend API. API marked with WIP is still under work",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/checkout/totalprice": {
+      "post": {
+        "summary": "Utilities API to calculate total price",
+        "description": "Calculate total price for items in cart",
+        "tags": [
+          "Checkout"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/customerid"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TotalPriceRequest"
+              }
+            }
+          }
+        },
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/checkout": {
+      "post": {
+        "summary": "Checkout all items (draft)",
+        "description": "Checkout all items",
+        "tags": [
+          "Checkout"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/customerid"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TotalPriceRequest"
+              }
+            }
+          }
+        },
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "parameters": {
+      "customerid": {
+        "in": "header",
+        "name": "customerid",
+        "schema": {
+          "type": "string"
+        },
+        "required": true,
+        "description": "Insert customer id in this header. In production customer id should be obtain from aunthenticated session but for simplicity we will add this in the header."
+      }
+    },
+    "schemas": {
+      "TotalPriceRequest": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/CheckoutItem"
+        },
+        "example": [
+          {
+            "Id": 1,
+            "Quantity": 4
+          },
+          {
+            "Id": 2,
+            "Quantity": 1
+          },
+          {
+            "Id": 3,
+            "Quantity": 1
+          }
+        ]
+      },
+      "CheckoutItem": {
+        "type": "object",
+        "properties": {
+          "Id": {
+            "type": "number",
+            "example": 23
+          },
+          "Quantity": {
+            "type": "number",
+            "example": 1
+          }
+        }
+      }
+    }
+  }
+}
